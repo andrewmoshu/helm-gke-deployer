@@ -1,0 +1,55 @@
+steps:
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  id: 'Build Helm Chart'
+  entrypoint: 'sh'
+  args:
+  - '-c'
+  - |
+    helm package ./$SOURCE_FOLDER -d ./helm_charts
+    VERSION=$(cat ./helm_charts/Chart.yaml | grep version | awk '{print $2}')
+    NAME=$(cat ./helm_charts/Chart.yaml | grep name | awk '{print $2}')
+    echo "VERSION=$VERSION" > ./helm_version.env
+    echo "NAME=$NAME" > ./helm_name.env
+  volumes:
+  - name: 'helm_charts'
+    path: '/workspace/helm_charts'
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  id: 'Upload Helm Chart to Artifact Registry'
+  entrypoint: 'sh'
+  args:
+  - '-c'
+  - |
+    gcloud auth configure-docker us-central1-docker.pkg.dev --project=$PROJECT_ID --quiet
+    VERSION=$(cat ./helm_version.env | cut -d'=' -f2)
+    NAME=$(cat ./helm_name.env | cut -d'=' -f2)    
+    helm package $SOURCE_FOLDER/
+    helm push ./helm_charts/$NAME-$VERSION.tgz oci://us-central1-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY/$NAME:$VERSION
+  waitFor:
+  - 'Build Helm Chart'
+  volumes:
+  - name: 'helm_charts'
+    path: '/workspace/helm_charts'
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  id: 'Deploy Helm Chart'
+  entrypoint: 'sh'
+  args:
+  - '-c'
+  - |
+    VERSION=$(cat ./helm_version.env | cut -d'=' -f2)
+    NAME=$(cat ./helm_name.env | cut -d'=' -f2) 
+    helm repo add helm-repo https://us-central1-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY
+    helm repo update
+    gcloud container clusters get-credentials --zone europe-central2 helm-cluster
+    helm upgrade --install $NAME helm-repo/$NAME --version $VERSION --atomic
+  waitFor:
+  - 'Upload Helm Chart to Artifact Registry'
+  volumes:
+  - name: 'helm_charts'
+    path: '/workspace/helm_charts'
+
+timeout: 1800s
+substitutions:
+  _PROJECT_ID: '	test-anmosh-proj'
+  _PROJECT_NUMBER: '1022268646542'
+  _ARTIFACT_REGISTRY: 'helm-deployer'
+  _SOURCE_FOLDER: 'nginx-chart'
