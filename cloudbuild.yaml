@@ -50,7 +50,5 @@ options:
   logging: CLOUD_LOGGING_ONLY
 timeout: 1800s
 substitutions:
-  _PROJECT_ID: 'test-anmosh-proj'
-  _PROJECT_NUMBER: '1022268646542'
   _ARTIFACT_REGISTRY: 'helm-deployer'
   _SOURCE_PATH: "nginx-chart"
