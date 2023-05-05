@@ -46,9 +46,10 @@ steps:
   volumes:
   - name: 'helm_charts'
     path: '/workspace/helm_charts'
-options:
-  logging: CLOUD_LOGGING_ONLY
-timeout: 1800s
 substitutions:
   _ARTIFACT_REGISTRY: "helm-deployer"
   _SOURCE_PATH: "nginx-chart"
+options:
+  logging: CLOUD_LOGGING_ONLY
+  substitution_option: 'ALLOW_LOOSE'
+timeout: 1800s
