@@ -5,9 +5,12 @@ steps:
   args:
   - '-c'
   - |
+    curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    chmod 700 get_helm.sh
+    ./get_helm.sh
     helm package ./nginx-chart -d ./helm_charts
-    export VERSION=$(cat ./helm_charts/Chart.yaml | grep version | awk '{print $2}')
-    export NAME=$(cat ./helm_charts/Chart.yaml | grep name | awk '{print $2}')
+    export VERSION=$(cat ./nginx-chart/Chart.yaml | grep version | awk '{print $2}')
+    export NAME=$(cat ./nginx-chart/Chart.yaml | grep name | awk '{print $2}')
     echo "VERSION=$$VERSION" > ./helm_version.env
     echo "NAME=$$NAME" > ./helm_name.env
   volumes:
@@ -19,11 +22,14 @@ steps:
   args:
   - '-c'
   - |
+    curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    chmod 700 get_helm.sh
+    ./get_helm.sh
     gcloud auth configure-docker us-central1-docker.pkg.dev --project=$PROJECT_ID --quiet
     export VERSION=$(cat ./helm_version.env | cut -d'=' -f2)
     export NAME=$(cat ./helm_name.env | cut -d'=' -f2)    
     helm package nginx-chart/
-    helm push ./helm_charts/$$NAME-$$VERSION.tgz oci://us-central1-docker.pkg.dev/$PROJECT_ID/helm-deployer/$$NAME:$$VERSION
+    helm push $$NAME-$$VERSION.tgz oci://us-central1-docker.pkg.dev/$PROJECT_ID/helm-deployer/$$NAME:$$VERSION
   waitFor:
   - 'Build Helm Chart'
   volumes:
