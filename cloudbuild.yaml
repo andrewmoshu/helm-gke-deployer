@@ -46,7 +46,8 @@ steps:
   volumes:
   - name: 'helm_charts'
     path: '/workspace/helm_charts'
-
+options:
+  logging: CLOUD_LOGGING_ONLY
 timeout: 1800s
 substitutions:
   _PROJECT_ID: '	test-anmosh-proj'
