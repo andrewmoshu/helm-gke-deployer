@@ -5,7 +5,7 @@ steps:
   args:
   - '-c'
   - |
-    helm package ./$SOURCE_PATH -d ./helm_charts
+    helm package ./nginx-chart -d ./helm_charts
     VERSION=$(cat ./helm_charts/Chart.yaml | grep version | awk '{print $2}')
     NAME=$(cat ./helm_charts/Chart.yaml | grep name | awk '{print $2}')
     echo "VERSION=$VERSION" > ./helm_version.env
@@ -22,7 +22,7 @@ steps:
     gcloud auth configure-docker us-central1-docker.pkg.dev --project=$PROJECT_ID --quiet
     VERSION=$(cat ./helm_version.env | cut -d'=' -f2)
     NAME=$(cat ./helm_name.env | cut -d'=' -f2)    
-    helm package $SOURCE_PATH/
+    helm package nginx-chart/
     helm push ./helm_charts/$NAME-$VERSION.tgz oci://us-central1-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY/$NAME:$VERSION
   waitFor:
   - 'Build Helm Chart'
@@ -48,7 +48,7 @@ steps:
     path: '/workspace/helm_charts'
 substitutions:
   _ARTIFACT_REGISTRY: "helm-deployer"
-  _SOURCE_PATH: "nginx-chart"
+  # nginx-chart: "nginx-chart"
 options:
   logging: CLOUD_LOGGING_ONLY
   substitution_option: 'ALLOW_LOOSE'
