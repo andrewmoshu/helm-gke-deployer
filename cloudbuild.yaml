@@ -29,7 +29,7 @@ steps:
     export VERSION=$(cat ./helm_version.env | cut -d'=' -f2)
     export NAME=$(cat ./helm_name.env | cut -d'=' -f2)    
     helm package nginx-chart/
-    helm push $$NAME-$$VERSION.tgz oci://us-central1-docker.pkg.dev/$PROJECT_ID/helm-deployer/$$NAME:$$VERSION
+    helm push $$NAME-$$VERSION.tgz oci://us-central1-docker.pkg.dev/$PROJECT_ID/helm-deployer
   waitFor:
   - 'Build Helm Chart'
   volumes:
