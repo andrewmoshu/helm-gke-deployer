@@ -8,7 +8,7 @@ steps:
     helm package ./nginx-chart -d ./helm_charts
     export VERSION=$(cat ./helm_charts/Chart.yaml | grep version | awk '{print $2}')
     NAME=$(cat ./helm_charts/Chart.yaml | grep name | awk '{print $2}')
-    echo "VERSION=$VERSION" > ./helm_version.env
+    echo "VERSION=$$VERSION" > ./helm_version.env
     echo "NAME=$NAME" > ./helm_name.env
   volumes:
   - name: 'helm_charts'
@@ -23,7 +23,7 @@ steps:
     export VERSION=$(cat ./helm_version.env | cut -d'=' -f2)
     NAME=$(cat ./helm_name.env | cut -d'=' -f2)    
     helm package nginx-chart/
-    helm push ./helm_charts/$NAME-${$VERSION}.tgz oci://us-central1-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY/$NAME:${$VERSION}
+    helm push ./helm_charts/$NAME-$$VERSION.tgz oci://us-central1-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY/$NAME:${$VERSION}
   waitFor:
   - 'Build Helm Chart'
   volumes:
@@ -40,7 +40,7 @@ steps:
     helm repo add helm-repo https://us-central1-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY
     helm repo update
     gcloud container clusters get-credentials --zone europe-central2 helm-cluster
-    helm upgrade --install $NAME helm-repo/$NAME --version $VERSION --atomic
+    helm upgrade --install $NAME helm-repo/$NAME --version $$VERSION --atomic
   waitFor:
   - 'Upload Helm Chart to Artifact Registry'
   volumes:
