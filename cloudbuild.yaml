@@ -50,5 +50,5 @@ options:
   logging: CLOUD_LOGGING_ONLY
 timeout: 1800s
 substitutions:
-  _ARTIFACT_REGISTRY: 'helm-deployer'
+  _ARTIFACT_REGISTRY: "helm-deployer"
   _SOURCE_PATH: "nginx-chart"
