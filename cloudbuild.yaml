@@ -41,6 +41,9 @@ steps:
   args:
   - '-c'
   - |
+    curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    chmod 700 get_helm.sh
+    ./get_helm.sh
     export VERSION=$(cat ./helm_version.env | cut -d'=' -f2)
     export NAME=$(cat ./helm_name.env | cut -d'=' -f2) 
     helm repo add helm-repo https://europe-central2-docker.pkg.dev/$PROJECT_ID/helm-deployer
@@ -52,9 +55,9 @@ steps:
   volumes:
   - name: 'helm_charts'
     path: '/workspace/helm_charts'
-substitutions:
-  # _ARTIFACT_REGISTRY: helm-deployer
-  # nginx-chart: "nginx-chart"
+# substitutions:
+#   # _ARTIFACT_REGISTRY: helm-deployer
+#   # nginx-chart: "nginx-chart"
 options:
   logging: CLOUD_LOGGING_ONLY
   substitution_option: 'ALLOW_LOOSE'
