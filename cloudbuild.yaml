@@ -48,7 +48,7 @@ steps:
     export NAME=$(cat ./helm_name.env | cut -d'=' -f2) 
     # helm repo add helm-repo https://europe-central2-docker.pkg.dev/$PROJECT_ID/helm-deployer
     # helm repo update
-    gcloud container clusters get-credentials --zone europe-central2 helm-cluster
+    gcloud container clusters get-credentials --zone europe-central2 my-gke-cluster
     helm upgrade --install nginx-chart oci://europe-central2-docker.pkg.dev/$PROJECT_ID/helm-deployer/nginx-chart --version 0.1.0 --atomic
   waitFor:
   - 'Upload Helm Chart to Artifact Registry'
